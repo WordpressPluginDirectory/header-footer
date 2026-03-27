@@ -50,6 +50,14 @@ if (isset($_POST['save'])) {
 }
 ?>
 
+<style>
+    .notice {
+        font-size: 1rem;
+        padding: 1rem;
+        line-height: 140%;
+    }
+</style>
+
 <script>
     jQuery(function () {
 
@@ -59,52 +67,57 @@ if (isset($_POST['save'])) {
         jQuery("#hefo-tabs").tabs();
     });
 </script>
-
+<?php include __DIR__ . '/menu.php'; ?>
 <div class="wrap">
     <!--https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5PHGDGNHAYLJ8-->
 
-    <h2>Head, Footer and Post Injections</h2>
+<!--    <h2>Head, Footer and Post Injections</h2>-->
 
     <?php if (!isset($dismissed['rate'])) { ?>
-        <div class="notice notice-success"><p>
+        <div class="notice notice-success">
                 I never asked before and I'm curious: <a href="http://wordpress.org/extend/plugins/header-footer/" target="_blank"><strong>would you rate this plugin</strong></a>?
                 (takes only few seconds required - account on WordPress.org, every blog owner should have one...). <strong>Really appreciated, Stefano</strong>.
-                <a class="hefo-dismiss" href="<?php echo wp_nonce_url($_SERVER['REQUEST_URI'] . '&dismiss=rate&noheader=1', 'dismiss') ?>">&times;</a>
-            </p>
+                <a class="hefo-dismiss" href="<?= esc_attr(wp_nonce_url($_SERVER['REQUEST_URI'] . '&dismiss=rate&noheader=1', 'dismiss')) ?>">&times;</a>
         </div>
     <?php } ?>
 
     <?php if (!isset($dismissed['newsletter'])) { ?>
-        <div class="notice notice-success"><p>
+        <div class="notice notice-success">
                 If you want to be informed of important updated of this plugin, you may want to subscribe to my (rare) newsletter<br>
-            <form action="http://www.satollo.net/?na=s" target="_blank" method="post">
+            <form action="https://www.satollo.net/?na=s" target="_blank" method="post">
                 <input type="hidden" value="header-footer" name="nr">
                 <input type="hidden" value="2" name="nl[]">
                 <input type="email" name="ne" value="<?php echo esc_attr(get_option('admin_email')) ?>">
                 <input type="submit" value="Subscribe">
             </form>
-            <a class="hefo-dismiss" href="<?php echo wp_nonce_url($_SERVER['REQUEST_URI'] . '&dismiss=newsletter&noheader=1', 'dismiss') ?>">&times;</a>
-            </p>
-        </div>
-    <?php } ?>
-
-    <?php if (!isset($dismissed['automation'])) { ?>
-        <div class="notice notice-success"><p>
-                I'm developing a new plugin:
-                <a href="https://automation.webagile.net" target="_blank">Welcome Email for Contact Form 7</a> (and more).
-                Available for direct donwload until I wait the approvation to publish on WP.org.
-            <a class="hefo-dismiss" href="<?php echo wp_nonce_url($_SERVER['REQUEST_URI'] . '&dismiss=automation&noheader=1', 'dismiss') ?>">&times;</a>
+            <a class="hefo-dismiss" href="<?= esc_attr(wp_nonce_url($_SERVER['REQUEST_URI'] . '&dismiss=newsletter&noheader=1', 'dismiss')) ?>">&times;</a>
 
         </div>
     <?php } ?>
 
-    <div style="padding: 15px; background-color: #fff; border: 1px solid #eee; font-size: 16px; line-height: 22px; margin-bottom: 10px;">
+    <?php if (!HEADER_FOOTER_ALLOW_PHP) { ?>
+        <div class="notice notice-warning">
+            PHP is disbaled by the constant <code>HEADER_FOOTER_ALLOW_PHP</code> in the
+            <code>wp-config.php</code> file.
+        </div>
+    <?php } ?>
+
+    <?php if (is_multisite() && !HEADER_FOOTER_MULTISITE_ALLOW_PHP) { ?>
+        <div class="notice notice-warning">
+            PHP is not allowed on multisite installations since a site admin can escalate to super-admin. If you're the only
+            administrator of all the sites, you can enable PHP setting the constant
+            <code>HEADER_FOOTER_MULTISITE_ALLOW_PHP</code> to <code>true</code> in the
+            <code>wp-config.php</code> file.
+        </div>
+    <?php } ?>
+
+    <div class="notice notice-success">
         Did this plugin save you lot of time and troubles?
-        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5PHGDGNHAYLJ8" target="_blank"><img style="vertical-align: bottom" src="<?php echo plugins_url('header-footer') ?>/images/donate.png"></a>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=5PHGDGNHAYLJ8" target="_blank"><img style="vertical-align: bottom" src="<?= esc_attr(plugins_url('header-footer')) ?>/images/donate.png"></a>
         To help children. Even <b>2$</b> help. <a href="http://www.satollo.net/donations" target="_blank">Please read more</a>. Thank you.
         <br>
         Are you profitably using this free plugin for your customers? One more reason to consider a
-        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5PHGDGNHAYLJ8" target="_blank">donation</a>. Thank you.
+        <a href="https://www.paypal.com/donate/?hosted_button_id=5PHGDGNHAYLJ8" target="_blank">donation</a>. Thank you.
     </div>
 
     <div style="padding: 15px; background-color: #fff; border: 1px solid #eee; font-size: 16px; line-height: 22px">
@@ -193,7 +206,7 @@ if (isset($_POST['save'])) {
             <div id="tabs-generics">
 
                 <?php for ($i = 1; $i <= 5; $i++) { ?>
-                    <h3>Generic injection <?php echo $i; ?></h3>
+                    <h3>Generic injection <?= (int)$i; ?></h3>
                     <p>Inject before the <?php hefo_base_text('generic_tag_' . $i); ?> marker</p>
                     <div class="row">
                         <div class="col-2">
@@ -262,9 +275,11 @@ if (isset($_POST['save'])) {
                     ?>
                     <h3><?php echo esc_html($post_type->label) ?></h3>
                     <p>
-                    <?php hefo_field_select($post_type->name . '_mode', [''=>__('Use the post configuration', 'header-footer'),
-                        'enabled'=>__('Enable injections below', 'header-footer'),
-                        'disabled'=>__('Do not inject', 'header-footer')]); ?>
+                        <?php
+                        hefo_field_select($post_type->name . '_mode', ['' => __('Use the post configuration', 'header-footer'),
+                            'enabled' => __('Enable injections below', 'header-footer'),
+                            'disabled' => __('Do not inject', 'header-footer')]);
+                        ?>
                     </p>
                     <div class="row">
 
@@ -292,7 +307,7 @@ if (isset($_POST['save'])) {
             <div id="tabs-post-inner">
 
                 <?php for ($i = 1; $i <= 5; $i++) { ?>
-                    <h3>Inner post injection <?php echo $i; ?></h3>
+                    <h3>Inner post injection <?= (int)$i; ?></h3>
                     <?php hefo_rule($i); ?>
                     <div class="row">
                         <div class="col-2">
@@ -319,7 +334,7 @@ if (isset($_POST['save'])) {
                 <div class="row">
 
                     <div class="col-2">
-                        <label><?php _e('Desktop', 'header-footer') ?>*</label>
+                        <label><?php esc_html_e('Desktop', 'header-footer') ?>*</label>
                         <?php hefo_base_textarea_cm('page_before'); ?>
                     </div>
                     <div class="col-2">
@@ -330,11 +345,11 @@ if (isset($_POST['save'])) {
 
                 <div class="clearfix"></div>
 
-                <h3><?php _e('After the page content', 'header-footer') ?></h3>
+                <h3><?php esc_html_e('After the page content', 'header-footer') ?></h3>
                 <div class="row">
 
                     <div class="col-2">
-                        <label><?php _e('Desktop', 'header-footer') ?>*</label>
+                        <label><?php esc_html_e('Desktop', 'header-footer') ?>*</label>
                         <?php hefo_base_textarea_cm('page_after'); ?>
                     </div>
                     <div class="col-2">
@@ -435,7 +450,7 @@ if (isset($_POST['save'])) {
                 </p>
                 <table class="form-table">
                     <?php for ($i = 1; $i <= 5; $i++) { ?>
-                        <tr valign="top"><?php hefo_field_textarea('snippet_' . $i, __('Snippet ' . $i, 'header-footer'), ''); ?></tr>
+                        <tr valign="top"><?php hefo_field_textarea('snippet_' . $i, __('Snippet', 'header-footer') . $i, ''); ?></tr>
                     <?php } ?>
                 </table>
                 <div class="clearfix"></div>
