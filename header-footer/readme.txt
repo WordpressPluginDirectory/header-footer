@@ -1,7 +1,7 @@
 === Head, Footer and Post Injections ===
 Tags: header, footer, ads, analytics, amp
 Tested up to: 6.9
-Stable tag: 3.3.4
+Stable tag: 3.3.6
 Donate link: https://www.paypal.com/donate/?hosted_button_id=5PHGDGNHAYLJ8
 Contributors: satollo
 License: GPLv2 or later
@@ -77,6 +77,14 @@ You can contribute to translate this plugin in your language on [WordPress Trans
 FAQs are answered on [Header and Footer](https://www.satollo.net/plugins/header-footer) page.
 
 == Changelog ==
+
+= 3.3.6 =
+
+* Version number fix
+
+= 3.3.5 =
+
+* Fixed not visible options on the admin side
 
 = 3.3.4 =
 

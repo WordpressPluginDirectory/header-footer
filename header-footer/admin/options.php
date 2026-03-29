@@ -1,6 +1,8 @@
 <?php
 defined('ABSPATH') || exit;
 
+global $options;
+
 // Quick security patch, to be better integrated
 if (!current_user_can('administrator')) {
     die();
